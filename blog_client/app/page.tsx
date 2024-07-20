@@ -1,28 +1,34 @@
 import Image from "next/image";
-async function getData() {
+import { Post } from "./types";
+
+type Posts = Post[];
+
+async function getPosts(): Promise<Post[]> {
   const res = await fetch("http://localhost:3001/api/v1/posts", {
-    next: { revalidate: 60 * 60 * 24 }, // ISR用の再検証時間
-    // cache: "no-store",
+    next: { revalidate: 60 * 60 * 24 },
   });
 
   if (!res.ok) {
-    throw new Error("Failed to fetch data");
+    throw new Error("Failed to fetch posts");
   }
-  // console.log(res.json());
-  const data = await res.json();
 
-  console.log("取得したデータ:", data);
-  return data;
+  const posts: Post[] = await res.json();
+  console.log("取得したデータ:", posts);
+  return posts;
 }
 export default async function Home() {
-  const posts = await getData();
+  const posts = await getPosts();
+  // const posts = await getData();
 
   return (
     <div>
       <h1>Blog</h1>
       <ul>
-        {posts.map((post: any) => (
-          <li key={post.id}>{post.title}</li>
+        {posts.map((post) => (
+          <li key={post.id}>
+            <h2>{post.title}</h2>
+            <p>{post.content}</p>
+          </li>
         ))}
       </ul>
     </div>
